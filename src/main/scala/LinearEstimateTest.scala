@@ -6,18 +6,14 @@ import java.util.concurrent.TimeUnit
 
 import org.lila.clockencoder.{LinearEstimator,WeightedLinearEstimator}
 
-import scala.util.Random
-
 @State(Scope.Thread)
 @BenchmarkMode(Array(Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
-class LinearEstimateTest {
-  val r = new Random()
-  val testData = Range(3000, 0, -100).map(_ + (r.nextGaussian * 100) toInt) toArray
+class LinearEstimateTest extends EncodingTestData {
 
   @Benchmark
-  def testEncode = LinearEstimator.process(testData, true)
+  def testEncode = LinearEstimator.process(trunc.trunced, true)
 
   @Benchmark
-  def testWeightedEncode = WeightedLinearEstimator.process(testData, true)
+  def testWeightedEncode = WeightedLinearEstimator.process(trunc.trunced, true)
 }
