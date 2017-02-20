@@ -4,13 +4,13 @@ import org.openjdk.jmh.annotations._
 
 import java.util.concurrent.TimeUnit
 
-import org.lila.clockencoder.LinearEstimator
+import org.lila.clockencoder.{LowBitTruncator, IntArrayList}
 
 @State(Scope.Thread)
 @BenchmarkMode(Array(Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
-class LinearEstimateTest extends EncodingTestData {
+class LowBitTruncTest extends EncodingTestData {
 
   @Benchmark
-  def testEncode = LinearEstimator.encode(trunced, startTime)
+  def testEncode = LowBitTruncator.lossyEncode(centis, new IntArrayList)
 }

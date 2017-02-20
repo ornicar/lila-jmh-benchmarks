@@ -12,8 +12,8 @@ import org.lila.clockencoder.Encoder
 class OverallEncodingTest extends EncodingTestData {
 
   @Benchmark
-  def testEncode = Encoder.encode(centis)
+  def testEncode = Encoder.encode(centis, startTime)
 
   @Benchmark
-  def testDecode = Encoder.decode(encoded, moves)
+  def testDecode = Encoder.decode(encoded, moves, startTime)
 }

@@ -5,9 +5,11 @@ import scala.util.Random
 
 trait EncodingTestData {
   private val r = new Random(1)
-  val centis = Range(30000, 0, -1000).map(_ + (r.nextGaussian * 500) toInt) toArray
-  val moves = centis.size
-  val trunc = LowBitTruncator.lossyEncode(centis)
-  val encodedRounds = LinearEstimator.process(trunc.trunced, true)
-  val encoded = Encoder.encode(centis)
+  val startTime = 30000
+  val centis = Range(29100, 0, -1000).map(_ + (r.nextGaussian * 500) toInt) toArray
+  val moves = centis.size - 1
+  val trunced = LowBitTruncator.lossyEncode(centis, new IntArrayList)
+  val encodedRounds = trunced.clone
+  LinearEstimator.encode(encodedRounds, startTime)
+  val encoded = Encoder.encode(centis, startTime)
 }
