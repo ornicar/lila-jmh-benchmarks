@@ -11,6 +11,8 @@ import org.lila.clockencoder.{LowBitTruncator, IntArrayList}
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 class LowBitTruncTest extends EncodingTestData {
 
+  val testData = centis.clone()
+
   @Benchmark
-  def testEncode = LowBitTruncator.lossyEncode(centis, new IntArrayList)
+  def testEncode = LowBitTruncator.truncate(testData)
 }

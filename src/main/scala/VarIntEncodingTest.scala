@@ -14,10 +14,10 @@ class VarIntEncodingTest extends EncodingTestData {
   @Benchmark
   def testEncode = {
     val writer = new BitWriter
-    VarIntEncoder.encode(encodedRounds, writer)
+    VarIntEncoder.write(encodedRounds, writer)
     writer.toArray
   }
 
   @Benchmark
-  def testDecode = VarIntEncoder.decode(new BitReader(encoded), moves)
+  def testDecode = VarIntEncoder.read(new BitReader(encoded), moves)
 }
