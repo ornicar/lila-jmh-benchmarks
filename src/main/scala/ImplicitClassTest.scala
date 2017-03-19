@@ -8,6 +8,7 @@ object implicitClasses {
 
   implicit final class ImplicitStandard[A](val oa: Option[A]) { def bar = oa.isDefined }
   implicit final class ImplicitAnyVal[A](val oa: Option[A]) extends AnyVal { def bar = oa.isDefined }
+  @inline implicit final class ImplicitInlineAnyVal[A](val oa: Option[A]) extends AnyVal { def bar = oa.isDefined }
 
 }
 
@@ -15,9 +16,11 @@ object implicitFunctions {
 
   final class ImplicitStandard[A](val oa: Option[A]) { def bar = oa.isDefined }
   final class ImplicitAnyVal[A](val oa: Option[A]) extends AnyVal { def bar = oa.isDefined }
+  @inline final class ImplicitInlineAnyVal[A](val oa: Option[A]) extends AnyVal { def bar = oa.isDefined }
 
   implicit def toStandard[A](oa: Option[A]) = new ImplicitStandard(oa)
   implicit def toAnyVal[A](oa: Option[A]) = new ImplicitAnyVal(oa)
+  @inline implicit def toInlineAnyVal[A](oa: Option[A]) = new ImplicitInlineAnyVal(oa)
 }
 
 @State(Scope.Thread)
@@ -41,6 +44,12 @@ class ImplicitClassTest {
   }
 
   @Benchmark
+  def testClassInlineAnyVal = {
+    import implicitClasses.ImplicitAnyVal
+    option.bar
+  }
+
+  @Benchmark
   def testFunctionStandard = {
     import implicitFunctions.toStandard
     option.bar
@@ -49,6 +58,12 @@ class ImplicitClassTest {
   @Benchmark
   def testFunctionAnyVal = {
     import implicitFunctions.toAnyVal
+    option.bar
+  }
+
+  @Benchmark
+  def testFunctionInlineAnyVal = {
+    import implicitFunctions.toInlineAnyVal
     option.bar
   }
 }
