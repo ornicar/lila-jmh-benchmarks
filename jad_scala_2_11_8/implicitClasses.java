@@ -5,7 +5,7 @@
 
 package org.openjdk.jmh.samples;
 
-import scala.Option;
+import scala.runtime.BoxesRunTime;
 
 // Referenced classes of package org.openjdk.jmh.samples:
 //            implicitClasses$
@@ -15,31 +15,31 @@ public final class implicitClasses
     public static final class ImplicitAnyVal
     {
 
-        public Option oa()
+        public int i()
         {
-            return oa;
+            return i;
         }
 
-        public boolean bar()
+        public int bar()
         {
-            return .MODULE..extension(oa());
+            return .MODULE..extension(i());
         }
 
         public int hashCode()
         {
-            return .MODULE..extension(oa());
+            return .MODULE..extension(i());
         }
 
         public boolean equals(Object x$1)
         {
-            return .MODULE..extension(oa(), x$1);
+            return .MODULE..extension(i(), x$1);
         }
 
-        private final Option oa;
+        private final int i;
 
-        public ImplicitAnyVal(Option oa)
+        public ImplicitAnyVal(int i)
         {
-            this.oa = oa;
+            this.i = i;
             super();
         }
     }
@@ -47,17 +47,17 @@ public final class implicitClasses
     public static class ImplicitAnyVal.
     {
 
-        public final boolean bar$extension(Option $this)
+        public final int bar$extension(int $this)
         {
-            return $this.isDefined();
+            return $this + 2;
         }
 
-        public final int hashCode$extension(Option $this)
+        public final int hashCode$extension(int $this)
         {
-            return $this.hashCode();
+            return BoxesRunTime.boxToInteger($this).hashCode();
         }
 
-        public final boolean equals$extension(Option $this, Object x$1)
+        public final boolean equals$extension(int $this, Object x$1)
         {
             boolean flag;
             if(x$1 instanceof ImplicitAnyVal)
@@ -66,27 +66,14 @@ public final class implicitClasses
                 flag = false;
             if(!flag) goto _L2; else goto _L1
 _L1:
-            Option option = x$1 != null ? ((ImplicitAnyVal)x$1).oa() : null;
-            $this;
-            if($this != null) goto _L4; else goto _L3
+            int i = ((ImplicitAnyVal)x$1).i();
+            if($this != i) goto _L2; else goto _L3
 _L3:
-            JVM INSTR pop ;
-            if(option == null) goto _L6; else goto _L5
-_L4:
-            option;
-            equals();
-            JVM INSTR ifeq 61;
-               goto _L6 _L5
-_L6:
-            if(true) goto _L7; else goto _L2
-_L5:
-            if(true) goto _L2; else goto _L7
-_L7:
             true;
-              goto _L8
+              goto _L4
 _L2:
             false;
-_L8:
+_L4:
             return;
         }
 
@@ -105,21 +92,21 @@ _L8:
     public static final class ImplicitStandard
     {
 
-        public Option oa()
+        public int i()
         {
-            return oa;
+            return i;
         }
 
-        public boolean bar()
+        public int bar()
         {
-            return oa().isDefined();
+            return i() + 2;
         }
 
-        private final Option oa;
+        private final int i;
 
-        public ImplicitStandard(Option oa)
+        public ImplicitStandard(int i)
         {
-            this.oa = oa;
+            this.i = i;
             super();
         }
     }
@@ -127,31 +114,31 @@ _L8:
     public static final class ImplicitInlineFunAnyVal
     {
 
-        public Option oa()
+        public int i()
         {
-            return oa;
+            return i;
         }
 
-        public boolean bar()
+        public int bar()
         {
-            return .MODULE..extension(oa());
+            return .MODULE..extension(i());
         }
 
         public int hashCode()
         {
-            return .MODULE..extension(oa());
+            return .MODULE..extension(i());
         }
 
         public boolean equals(Object x$1)
         {
-            return .MODULE..extension(oa(), x$1);
+            return .MODULE..extension(i(), x$1);
         }
 
-        private final Option oa;
+        private final int i;
 
-        public ImplicitInlineFunAnyVal(Option oa)
+        public ImplicitInlineFunAnyVal(int i)
         {
-            this.oa = oa;
+            this.i = i;
             super();
         }
     }
@@ -159,17 +146,17 @@ _L8:
     public static class ImplicitInlineFunAnyVal.
     {
 
-        public final boolean bar$extension(Option $this)
+        public final int bar$extension(int $this)
         {
-            return $this.isDefined();
+            return $this + 2;
         }
 
-        public final int hashCode$extension(Option $this)
+        public final int hashCode$extension(int $this)
         {
-            return $this.hashCode();
+            return BoxesRunTime.boxToInteger($this).hashCode();
         }
 
-        public final boolean equals$extension(Option $this, Object x$1)
+        public final boolean equals$extension(int $this, Object x$1)
         {
             boolean flag;
             if(x$1 instanceof ImplicitInlineFunAnyVal)
@@ -178,27 +165,14 @@ _L8:
                 flag = false;
             if(!flag) goto _L2; else goto _L1
 _L1:
-            Option option = x$1 != null ? ((ImplicitInlineFunAnyVal)x$1).oa() : null;
-            $this;
-            if($this != null) goto _L4; else goto _L3
+            int i = ((ImplicitInlineFunAnyVal)x$1).i();
+            if($this != i) goto _L2; else goto _L3
 _L3:
-            JVM INSTR pop ;
-            if(option == null) goto _L6; else goto _L5
-_L4:
-            option;
-            equals();
-            JVM INSTR ifeq 61;
-               goto _L6 _L5
-_L6:
-            if(true) goto _L7; else goto _L2
-_L5:
-            if(true) goto _L2; else goto _L7
-_L7:
             true;
-              goto _L8
+              goto _L4
 _L2:
             false;
-_L8:
+_L4:
             return;
         }
 
@@ -217,31 +191,31 @@ _L8:
     public static final class ImplicitInlineBothAnyVal
     {
 
-        public Option oa()
+        public int i()
         {
-            return oa;
+            return i;
         }
 
-        public boolean bar()
+        public int bar()
         {
-            return .MODULE..extension(oa());
+            return .MODULE..extension(i());
         }
 
         public int hashCode()
         {
-            return .MODULE..extension(oa());
+            return .MODULE..extension(i());
         }
 
         public boolean equals(Object x$1)
         {
-            return .MODULE..extension(oa(), x$1);
+            return .MODULE..extension(i(), x$1);
         }
 
-        private final Option oa;
+        private final int i;
 
-        public ImplicitInlineBothAnyVal(Option oa)
+        public ImplicitInlineBothAnyVal(int i)
         {
-            this.oa = oa;
+            this.i = i;
             super();
         }
     }
@@ -249,17 +223,17 @@ _L8:
     public static class ImplicitInlineBothAnyVal.
     {
 
-        public final boolean bar$extension(Option $this)
+        public final int bar$extension(int $this)
         {
-            return $this.isDefined();
+            return $this + 2;
         }
 
-        public final int hashCode$extension(Option $this)
+        public final int hashCode$extension(int $this)
         {
-            return $this.hashCode();
+            return BoxesRunTime.boxToInteger($this).hashCode();
         }
 
-        public final boolean equals$extension(Option $this, Object x$1)
+        public final boolean equals$extension(int $this, Object x$1)
         {
             boolean flag;
             if(x$1 instanceof ImplicitInlineBothAnyVal)
@@ -268,27 +242,14 @@ _L8:
                 flag = false;
             if(!flag) goto _L2; else goto _L1
 _L1:
-            Option option = x$1 != null ? ((ImplicitInlineBothAnyVal)x$1).oa() : null;
-            $this;
-            if($this != null) goto _L4; else goto _L3
+            int i = ((ImplicitInlineBothAnyVal)x$1).i();
+            if($this != i) goto _L2; else goto _L3
 _L3:
-            JVM INSTR pop ;
-            if(option == null) goto _L6; else goto _L5
-_L4:
-            option;
-            equals();
-            JVM INSTR ifeq 61;
-               goto _L6 _L5
-_L6:
-            if(true) goto _L7; else goto _L2
-_L5:
-            if(true) goto _L2; else goto _L7
-_L7:
             true;
-              goto _L8
+              goto _L4
 _L2:
             false;
-_L8:
+_L4:
             return;
         }
 
@@ -307,31 +268,31 @@ _L8:
     public static final class ImplicitInlineClassAnyVal
     {
 
-        public Option oa()
+        public int i()
         {
-            return oa;
+            return i;
         }
 
-        public boolean bar()
+        public int bar()
         {
-            return .MODULE..extension(oa());
+            return .MODULE..extension(i());
         }
 
         public int hashCode()
         {
-            return .MODULE..extension(oa());
+            return .MODULE..extension(i());
         }
 
         public boolean equals(Object x$1)
         {
-            return .MODULE..extension(oa(), x$1);
+            return .MODULE..extension(i(), x$1);
         }
 
-        private final Option oa;
+        private final int i;
 
-        public ImplicitInlineClassAnyVal(Option oa)
+        public ImplicitInlineClassAnyVal(int i)
         {
-            this.oa = oa;
+            this.i = i;
             super();
         }
     }
@@ -339,17 +300,17 @@ _L8:
     public static class ImplicitInlineClassAnyVal.
     {
 
-        public final boolean bar$extension(Option $this)
+        public final int bar$extension(int $this)
         {
-            return $this.isDefined();
+            return $this + 2;
         }
 
-        public final int hashCode$extension(Option $this)
+        public final int hashCode$extension(int $this)
         {
-            return $this.hashCode();
+            return BoxesRunTime.boxToInteger($this).hashCode();
         }
 
-        public final boolean equals$extension(Option $this, Object x$1)
+        public final boolean equals$extension(int $this, Object x$1)
         {
             boolean flag;
             if(x$1 instanceof ImplicitInlineClassAnyVal)
@@ -358,27 +319,14 @@ _L8:
                 flag = false;
             if(!flag) goto _L2; else goto _L1
 _L1:
-            Option option = x$1 != null ? ((ImplicitInlineClassAnyVal)x$1).oa() : null;
-            $this;
-            if($this != null) goto _L4; else goto _L3
+            int i = ((ImplicitInlineClassAnyVal)x$1).i();
+            if($this != i) goto _L2; else goto _L3
 _L3:
-            JVM INSTR pop ;
-            if(option == null) goto _L6; else goto _L5
-_L4:
-            option;
-            equals();
-            JVM INSTR ifeq 61;
-               goto _L6 _L5
-_L6:
-            if(true) goto _L7; else goto _L2
-_L5:
-            if(true) goto _L2; else goto _L7
-_L7:
             true;
-              goto _L8
+              goto _L4
 _L2:
             false;
-_L8:
+_L4:
             return;
         }
 
@@ -395,28 +343,28 @@ _L8:
     }
 
 
-    public static Option ImplicitInlineClassAnyVal(Option option)
+    public static int ImplicitInlineClassAnyVal(int i)
     {
-        return implicitClasses$.MODULE$.ImplicitInlineClassAnyVal(option);
+        return implicitClasses$.MODULE$.ImplicitInlineClassAnyVal(i);
     }
 
-    public static Option ImplicitInlineFunAnyVal(Option option)
+    public static int ImplicitInlineFunAnyVal(int i)
     {
-        return implicitClasses$.MODULE$.ImplicitInlineFunAnyVal(option);
+        return implicitClasses$.MODULE$.ImplicitInlineFunAnyVal(i);
     }
 
-    public static Option ImplicitInlineBothAnyVal(Option option)
+    public static int ImplicitInlineBothAnyVal(int i)
     {
-        return implicitClasses$.MODULE$.ImplicitInlineBothAnyVal(option);
+        return implicitClasses$.MODULE$.ImplicitInlineBothAnyVal(i);
     }
 
-    public static Option ImplicitAnyVal(Option option)
+    public static int ImplicitAnyVal(int i)
     {
-        return implicitClasses$.MODULE$.ImplicitAnyVal(option);
+        return implicitClasses$.MODULE$.ImplicitAnyVal(i);
     }
 
-    public static ImplicitStandard ImplicitStandard(Option option)
+    public static ImplicitStandard ImplicitStandard(int i)
     {
-        return implicitClasses$.MODULE$.ImplicitStandard(option);
+        return implicitClasses$.MODULE$.ImplicitStandard(i);
     }
 }

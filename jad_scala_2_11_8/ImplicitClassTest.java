@@ -5,9 +5,6 @@
 
 package org.openjdk.jmh.samples;
 
-import scala.Option;
-import scala.Option$;
-import scala.runtime.BoxesRunTime;
 
 // Referenced classes of package org.openjdk.jmh.samples:
 //            implicitClasses$, implicitFunctions$, implicitClasses, implicitFunctions
@@ -15,70 +12,69 @@ import scala.runtime.BoxesRunTime;
 public class ImplicitClassTest
 {
 
-    public Option option()
+    public int option()
     {
         return option;
     }
 
-    public boolean testClassStandard()
+    public int testClassStandard()
     {
         return implicitClasses$.MODULE$.ImplicitStandard(option()).bar();
     }
 
-    public boolean testClassAnyVal()
+    public int testClassAnyVal()
     {
         return implicitClasses.ImplicitAnyVal..MODULE$.bar$extension(implicitClasses$.MODULE$.ImplicitAnyVal(option()));
     }
 
-    public boolean testClassInlineBothAnyVal()
+    public int testClassInlineBothAnyVal()
     {
-        Option option1 = option();
+        int i = option();
         implicitClasses$ implicitclasses$ = implicitClasses$.MODULE$;
         implicitClasses.ImplicitInlineBothAnyVal. 1 = implicitClasses.ImplicitInlineBothAnyVal..MODULE$;
-        return option1.isDefined();
+        return i + 2;
     }
 
-    public boolean testClassImplicitInlineFunAnyVal()
+    public int testClassImplicitInlineFunAnyVal()
     {
-        Option option1 = implicitClasses$.MODULE$.ImplicitInlineFunAnyVal(option());
+        int i = implicitClasses$.MODULE$.ImplicitInlineFunAnyVal(option());
         implicitClasses.ImplicitInlineFunAnyVal. 1 = implicitClasses.ImplicitInlineFunAnyVal..MODULE$;
-        return option1.isDefined();
+        return i + 2;
     }
 
-    public boolean testClassImplicitInlineClassAnyVal()
+    public int testClassImplicitInlineClassAnyVal()
     {
-        Option option1 = option();
+        int i = option();
         implicitClasses$ implicitclasses$ = implicitClasses$.MODULE$;
-        return implicitClasses.ImplicitInlineClassAnyVal..MODULE$.bar$extension(option1);
+        return implicitClasses.ImplicitInlineClassAnyVal..MODULE$.bar$extension(i);
     }
 
-    public boolean testFunctionStandard()
+    public int testFunctionStandard()
     {
         return implicitFunctions$.MODULE$.toStandard(option()).bar();
     }
 
-    public boolean testFunctionAnyVal()
+    public int testFunctionAnyVal()
     {
         return implicitFunctions.ImplicitAnyVal..MODULE$.bar$extension(implicitFunctions$.MODULE$.toAnyVal(option()));
     }
 
-    public boolean testFunctionInlineAnyVal()
+    public int testFunctionInlineAnyVal()
     {
-        Option option1 = option();
+        int i = option();
         implicitFunctions$ implicitfunctions$ = implicitFunctions$.MODULE$;
         implicitFunctions.ImplicitInlineAnyVal. 1 = implicitFunctions.ImplicitInlineAnyVal..MODULE$;
-        return option1.isDefined();
+        return i + 2;
     }
 
-    public boolean baseline()
+    public int baseline()
     {
-        return option().isDefined();
+        return option() + 2;
     }
 
     public ImplicitClassTest()
     {
-        option = Option$.MODULE$.apply(BoxesRunTime.boxToInteger(42));
     }
 
-    private final Option option;
+    private final int option = 42;
 }
