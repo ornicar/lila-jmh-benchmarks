@@ -9,4 +9,6 @@ libraryDependencies ++= Seq(
   // "group" % "artifact" % "version"
 )
 
+scalacOptions := Seq("-optimise")
+
 enablePlugins(JmhPlugin)

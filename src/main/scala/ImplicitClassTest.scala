@@ -6,21 +6,23 @@ import java.util.concurrent.TimeUnit
 
 object implicitClasses {
 
-  implicit final class ImplicitStandard[A](val oa: Option[A]) { def bar = oa.isDefined }
-  implicit final class ImplicitAnyVal[A](val oa: Option[A]) extends AnyVal { def bar = oa.isDefined }
-  @inline implicit final class ImplicitInlineAnyVal[A](val oa: Option[A]) extends AnyVal { def bar = oa.isDefined }
+  implicit final class ImplicitStandard[A](val i: Int) { def bar = i + 2 }
+  implicit final class ImplicitAnyVal[A](val i: Int) extends AnyVal { def bar = i + 2 }
+  @inline implicit final class ImplicitInlineBothAnyVal[A](val i: Int) extends AnyVal { @inline def bar = i + 2 }
+  implicit final class ImplicitInlineFunAnyVal[A](val i: Int) extends AnyVal { @inline def bar = i + 2 }
+  @inline implicit final class ImplicitInlineClassAnyVal[A](val i: Int) extends AnyVal { def bar = i + 2 }
 
 }
 
 object implicitFunctions {
 
-  final class ImplicitStandard[A](val oa: Option[A]) { def bar = oa.isDefined }
-  final class ImplicitAnyVal[A](val oa: Option[A]) extends AnyVal { def bar = oa.isDefined }
-  @inline final class ImplicitInlineAnyVal[A](val oa: Option[A]) extends AnyVal { def bar = oa.isDefined }
+  final class ImplicitStandard[A](val i: Int) { def bar = i + 2 }
+  final class ImplicitAnyVal[A](val i: Int) extends AnyVal { def bar = i + 2 }
+  final class ImplicitInlineAnyVal[A](val i: Int) extends AnyVal { @inline def bar = i + 2 }
 
-  implicit def toStandard[A](oa: Option[A]) = new ImplicitStandard(oa)
-  implicit def toAnyVal[A](oa: Option[A]) = new ImplicitAnyVal(oa)
-  @inline implicit def toInlineAnyVal[A](oa: Option[A]) = new ImplicitInlineAnyVal(oa)
+  implicit def toStandard[A](i: Int) = new ImplicitStandard(i)
+  implicit def toAnyVal[A](i: Int) = new ImplicitAnyVal(i)
+  @inline implicit def toInlineAnyVal[A](i: Int) = new ImplicitInlineAnyVal(i)
 }
 
 @State(Scope.Thread)
@@ -29,7 +31,7 @@ object implicitFunctions {
 class ImplicitClassTest {
 
 
-  val option = Option(42)
+  val option: Int = 42
 
   @Benchmark
   def testClassStandard = {
@@ -44,8 +46,20 @@ class ImplicitClassTest {
   }
 
   @Benchmark
-  def testClassInlineAnyVal = {
-    import implicitClasses.ImplicitAnyVal
+  def testClassInlineBothAnyVal = {
+    import implicitClasses.ImplicitInlineBothAnyVal
+    option.bar
+  }
+
+  @Benchmark
+  def testClassImplicitInlineFunAnyVal = {
+    import implicitClasses.ImplicitInlineFunAnyVal
+    option.bar
+  }
+
+  @Benchmark
+  def testClassImplicitInlineClassAnyVal = {
+    import implicitClasses.ImplicitInlineClassAnyVal
     option.bar
   }
 
@@ -66,4 +80,7 @@ class ImplicitClassTest {
     import implicitFunctions.toInlineAnyVal
     option.bar
   }
+
+  @Benchmark
+  def baseline = option + 2
 }
