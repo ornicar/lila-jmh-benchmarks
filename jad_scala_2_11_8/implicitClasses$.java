@@ -5,6 +5,7 @@
 
 package org.openjdk.jmh.samples;
 
+import scala.Option;
 
 // Referenced classes of package org.openjdk.jmh.samples:
 //            implicitClasses
@@ -12,29 +13,29 @@ package org.openjdk.jmh.samples;
 public final class implicitClasses$
 {
 
-    public implicitClasses.ImplicitStandard ImplicitStandard(int i)
+    public implicitClasses.ImplicitStandard ImplicitStandard(Option oa)
     {
-        return new implicitClasses.ImplicitStandard(i);
+        return new implicitClasses.ImplicitStandard(oa);
     }
 
-    public int ImplicitAnyVal(int i)
+    public Option ImplicitAnyVal(Option oa)
     {
-        return i;
+        return oa;
     }
 
-    public int ImplicitInlineBothAnyVal(int i)
+    public Option ImplicitInlineBothAnyVal(Option oa)
     {
-        return i;
+        return oa;
     }
 
-    public int ImplicitInlineFunAnyVal(int i)
+    public Option ImplicitInlineFunAnyVal(Option oa)
     {
-        return i;
+        return oa;
     }
 
-    public int ImplicitInlineClassAnyVal(int i)
+    public Option ImplicitInlineClassAnyVal(Option oa)
     {
-        return i;
+        return oa;
     }
 
     private implicitClasses$()
