@@ -5,6 +5,7 @@
 
 package org.openjdk.jmh.samples;
 
+import scala.Option;
 
 // Referenced classes of package org.openjdk.jmh.samples:
 //            implicitFunctions
@@ -12,19 +13,19 @@ package org.openjdk.jmh.samples;
 public final class implicitFunctions$
 {
 
-    public implicitFunctions.ImplicitStandard toStandard(int i)
+    public implicitFunctions.ImplicitStandard toStandard(Option oa)
     {
-        return new implicitFunctions.ImplicitStandard(i);
+        return new implicitFunctions.ImplicitStandard(oa);
     }
 
-    public int toAnyVal(int i)
+    public Option toAnyVal(Option oa)
     {
-        return i;
+        return oa;
     }
 
-    public int toInlineAnyVal(int i)
+    public Option toInlineAnyVal(Option oa)
     {
-        return i;
+        return oa;
     }
 
     private implicitFunctions$()
