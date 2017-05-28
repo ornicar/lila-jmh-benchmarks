@@ -9,6 +9,14 @@ import java.util.concurrent.TimeUnit
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 class HtmlEscape {
 
+/* Results (i7 6700HQ)
+[info] Benchmark                    Mode  Cnt     Score     Error  Units
+[info] HtmlEscape.testLongAscii     avgt   10  3504.387 ± 198.163  ns/op
+[info] HtmlEscape.testLongUnicode   avgt   10  3924.027 ± 102.305  ns/op
+[info] HtmlEscape.testShortAscii    avgt   10   382.070 ±  18.223  ns/op
+[info] HtmlEscape.testShortUnicode  avgt   10   429.636 ±  12.383  ns/op
+*/
+
     def escape(s: String): String = {
       val sb = new StringBuilder
       var i = 0
