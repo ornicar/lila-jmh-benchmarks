@@ -30,11 +30,11 @@ class SafeJsonStringTest {
     val arabic = """قد يكون خصمك قد ترك المباراة. يمكنك المطالبة بالنصر، أو التعادل، أو إنتظر."""
   }
 
-  @scala.inline def isSafe(c: Char): Boolean =
-    c != '<' && c != '>' && c != '&' && c != '"' && c != '\'' && /* html */
+  @scala.inline final def isSafe(c: Char): Boolean =
+    c >= ' ' && c <= '~' && /* printable ascii 32-126 */
+      c != '<' && c != '>' && c != '&' && c != '"' && c != '\'' && /* html */
       c != '\\' && /* remaining js */
       c != '`' && c != '/' && /* extra care */
-      32 <= c.toInt && c.toInt <= 126 /* printable ascii */
 
   object impls {
     /*
@@ -116,8 +116,8 @@ class SafeJsonStringTest {
         if (isSafe(c)) sb.append(c)
         else {
           if (c <= '\u000f') sb.append("\\u000")
-          if (c <= '\u00ff') sb.append("\\u00")
-          if (c <= '\u0fff') sb.append("\\u0")
+          else if (c <= '\u00ff') sb.append("\\u00")
+          else if (c <= '\u0fff') sb.append("\\u0")
           else sb.append("\\u")
           sb.append(c.toInt.toHexString.toUpperCase)
         }
