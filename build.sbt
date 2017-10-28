@@ -1,12 +1,10 @@
-name := """sbt-jmh-seed"""
+name := """lila-jmh-benchmarks"""
 
 version := "1.0-SNAPSHOT"
 
-scalaVersion := "2.11.8"
+scalaVersion := "2.11.11"
 
 libraryDependencies ++= Seq(
-  // Add your own project dependencies in the form:
-  // "group" % "artifact" % "version"
 )
 
 scalacOptions := Seq("-optimise")
