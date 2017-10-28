@@ -16,6 +16,12 @@ class SafeJsonStringTest {
     val arabic = """قد يكون خصمك قد ترك المباراة. يمكنك المطالبة بالنصر، أو التعادل، أو إنتظر."""
   }
 
+  @scala.inline def isSafe(c: Char): Boolean =
+    c != '<' && c != '>' && c != '&' && c != '"' && c != '\'' && /* html */
+      c != '\\' && /* remaining js */
+      c != '`' && c != '/' && /* extra care */
+      32 <= c.toInt && c.toInt <= 126 /* printable ascii */
+
   object impls {
     /*
      * Benchmark                       Mode  Cnt      Score      Error  Units
@@ -27,44 +33,89 @@ class SafeJsonStringTest {
     def base(str: String): String = {
       val escaped = str.flatMap { c =>
         val code = c.toInt
-        if (c != '<' && c != '>' && c != '&' && c != '"' && c != '\'' && /* html */
-          c != '\\' && /* remaining js */
-          c != '`' && c != '/' && /* extra care */
-          32 <= code && code <= 126 /* printable ascii */ ) Some(c) else {
+        if (isSafe(c)) Some(c)
+        else {
           def hexCode = code.toHexString.reverse.padTo(4, '0').reverse
           '\\' +: s"u${hexCode.toUpperCase}"
         }
       }
       s""""${escaped}""""
     }
-    // def opt1(s: String): String = {
-    //   val sb = new StringBuilder(s.size)
-    //   var i = 0
-    //   while (i < s.length) {
-    //     val code = c.toInt
-    //     if (c != '<' && c != '>' && c != '&' && c != '"' && c != '\'' && /* html */
-    //       c != '\\' && /* remaining js */
-    //       c != '`' && c != '/' && /* extra care */
-    //       32 <= code && code <= 126 /* printable ascii */ ) sb.append(c)
-    //     else {
-    //       def hexCode = code.toHexString.reverse.padTo(4, '0').reverse
-    //       ('\\' +: s"u${hexCode.toUpperCase}") foreach sb.append
-    //     }
-    //     i += 1
-    //   }
-    //   sb.toString
-    // }
+    /*
+     * Benchmark                       Mode  Cnt      Score      Error  Units
+     * SafeJsonStringTest.opt1_arabic  avgt   10  31157.899 ± 2131.986  ns/op
+     * SafeJsonStringTest.opt1_long    avgt   10    822.963 ±   12.034  ns/op
+     * SafeJsonStringTest.opt1_medium  avgt   10    161.983 ±    6.035  ns/op
+     * SafeJsonStringTest.opt1_short   avgt   10     68.615 ±    4.548  ns/op
+     */
+    def opt1(s: String): String = {
+      val sb = new StringBuilder(s.size)
+      var i = 0
+      while (i < s.length) {
+        val c = s charAt i
+        if (isSafe(c)) sb.append(c)
+        else {
+          def hexCode = c.toInt.toHexString.reverse.padTo(4, '0').reverse
+          ('\\' +: s"u${hexCode.toUpperCase}") foreach sb.append
+        }
+        i += 1
+      }
+      sb.toString
+    }
+
+    /*
+[info] Benchmark                       Mode  Cnt      Score      Error  Units
+[info] SafeJsonStringTest.opt2_arabic  avgt   10  23550.124 ± 1080.420  ns/op
+[info] SafeJsonStringTest.opt2_long    avgt   10    827.895 ±   27.924  ns/op
+[info] SafeJsonStringTest.opt2_medium  avgt   10    160.550 ±    4.402  ns/op
+[info] SafeJsonStringTest.opt2_short   avgt   10     67.328 ±    4.376  ns/op
+*/
+    def opt2(s: String): String = {
+      val sb = new StringBuilder(s.size)
+      var i = 0
+      while (i < s.length) {
+        val c = s charAt i
+        if (isSafe(c)) sb.append(c)
+        else sb.append(s"\\u${c.toInt.toHexString.reverse.toUpperCase.padTo(4, '0').reverse}")
+        i += 1
+      }
+      sb.toString
+    }
   }
 
-  @Benchmark
-  def base_short = impls.base(strings.short)
+  // @Benchmark
+  // def base_short = impls.base(strings.short)
+
+  // @Benchmark
+  // def base_medium = impls.base(strings.medium)
+
+  // @Benchmark
+  // def base_long = impls.base(strings.long)
+
+  // @Benchmark
+  // def base_arabic = impls.base(strings.arabic)
+
+  // @Benchmark
+  // def opt1_short = impls.opt1(strings.short)
+
+  // @Benchmark
+  // def opt1_medium = impls.opt1(strings.medium)
+
+  // @Benchmark
+  // def opt1_long = impls.opt1(strings.long)
+
+  // @Benchmark
+  // def opt1_arabic = impls.opt1(strings.arabic)
 
   @Benchmark
-  def base_medium = impls.base(strings.medium)
+  def opt2_short = impls.opt2(strings.short)
 
   @Benchmark
-  def base_long = impls.base(strings.long)
+  def opt2_medium = impls.opt2(strings.medium)
 
   @Benchmark
-  def base_arabic = impls.base(strings.arabic)
+  def opt2_long = impls.opt2(strings.long)
+
+  @Benchmark
+  def opt2_arabic = impls.opt2(strings.arabic)
 }
