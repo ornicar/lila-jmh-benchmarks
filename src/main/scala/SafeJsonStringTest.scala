@@ -34,7 +34,14 @@ class SafeJsonStringTest {
     c >= ' ' && c <= '~' && /* printable ascii 32-126 */
       c != '<' && c != '>' && c != '&' && c != '"' && c != '\'' && /* html */
       c != '\\' && /* remaining js */
-      c != '`' && c != '/' && /* extra care */
+      c != '`' && c != '/' //&& /* extra care */
+
+
+  @inline final def isSafe2(c: Char): Boolean = c match {
+    case _ if c < ' ' || c > '~' => false
+    case '<' | '>' | '&' | '"' | '\'' | '\\' | '`' | '/' => false
+    case _ => true
+  }
 
   object impls {
     /*
@@ -125,6 +132,44 @@ class SafeJsonStringTest {
       }
       sb.toString
     }
+
+    def opt5(s: String): String = {
+      val sb = new StringBuilder(s.size)
+      var i = 0
+      while (i < s.length) {
+        val c = s charAt i
+        if (isSafe2(c)) sb.append(c)
+        else {
+          if (c <= '\u000f') sb.append("\\u000")
+          else if (c <= '\u00ff') sb.append("\\u00")
+          else if (c <= '\u0fff') sb.append("\\u0")
+          else sb.append("\\u")
+          sb.append(c.toInt.toHexString.toUpperCase)
+        }
+        i += 1
+      }
+      sb.toString
+    }
+
+    def opt6(s: String): String = {
+      val sb = new StringBuilder(3 * s.size >> 1)
+      var i = 0
+      while (i < s.length) {
+        val c = s charAt i
+        if (isSafe2(c)) sb.append(c)
+        else {
+          sb.append(c match {
+            case _ if c <= '\u000f' => "\\u000"
+            case _ if c <= '\u00ff' => "\\u00"
+            case _ if c <= '\u0fff' =>"\\u0"
+            case _ => "\\u"
+          })
+          sb.append(c.toHexString)
+        }
+        i += 1
+      }
+      sb.toString
+    }
   }
 
   @Benchmark
@@ -156,4 +201,10 @@ class SafeJsonStringTest {
 
   @Benchmark
   def opt4_arabic = impls.opt4(strings.arabic)
+
+  @Benchmark
+  def opt5_arabic = impls.opt5(strings.arabic)
+
+  @Benchmark
+  def opt6_arabic = impls.opt6(strings.arabic)
 }
