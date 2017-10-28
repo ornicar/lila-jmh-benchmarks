@@ -7,6 +7,8 @@ scalaVersion := "2.11.11"
 libraryDependencies ++= Seq(
 )
 
-scalacOptions := Seq("-optimise")
+scalacOptions := Seq(
+  "-optimise",
+  "-Yinline-warnings")
 
 enablePlugins(JmhPlugin)
