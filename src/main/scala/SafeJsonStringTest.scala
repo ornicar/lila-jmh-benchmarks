@@ -143,10 +143,10 @@ class SafeJsonStringTest {
     }
 
     def opt4Optimist(s: String): String =
-      if (s.forall(isSafe)) s else opt4(s)
+      if (s.forall(isSafe)) s"\"$s\"" else opt4(s)
 
-    def opt5(s: String): String = {
-      val sb = new StringBuilder(s.size * 3/2 + 2)
+    def opt5(s: String): String = if (s.forall(isSafe)) s"\"$s\"" else {
+      val sb = new StringBuilder(s.size * 2 + 2)
       sb.append('"')
       var i = 0
       while (i < s.length) {
@@ -211,17 +211,20 @@ class SafeJsonStringTest {
   // @Benchmark
   // def opt4_arabic = impls.opt4(strings.arabic)
 
-  @Benchmark
-  def opt4_short = impls.opt4(strings.short)
+//   @Benchmark
+//   def opt4_short = impls.opt4(strings.short)
 
-  @Benchmark
-  def opt4Optimist_short = impls.opt4Optimist(strings.short)
+//   @Benchmark
+//   def opt4Optimist_short = impls.opt4Optimist(strings.short)
 
-  @Benchmark
-  def opt4Optimist_medium = impls.opt4Optimist(strings.medium)
+//   @Benchmark
+//   def opt4Optimist_medium = impls.opt4Optimist(strings.medium)
 
   @Benchmark
   def opt4Optimist_arabic = impls.opt4Optimist(strings.arabic)
+
+  @Benchmark
+  def opt5_arabic = impls.opt5(strings.arabic)
 
 //   @Benchmark
 //   def isSafe = strings.longChars foreach impls.isSafe
