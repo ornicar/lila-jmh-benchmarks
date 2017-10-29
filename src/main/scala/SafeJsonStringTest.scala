@@ -28,22 +28,23 @@ class SafeJsonStringTest {
     val medium = "Please be nice in the chat!"
     val long = """Free online Chess server. Play Chess now in a clean interface. No registration, no ads, no plugin required. Play Chess with the computer, friends or random opponents."""
     val arabic = """قد يكون خصمك قد ترك المباراة. يمكنك المطالبة بالنصر، أو التعادل، أو إنتظر."""
-  }
 
-  @scala.inline final def isSafe(c: Char): Boolean =
-    c >= ' ' && c <= '~' && /* printable ascii 32-126 */
-      c != '<' && c != '>' && c != '&' && c != '"' && c != '\'' && /* html */
-      c != '\\' && /* remaining js */
-      c != '`' && c != '/' /* extra care */
-
-
-  @inline final def isSafe2(c: Char): Boolean = c match {
-    case _ if c < ' ' || c > '~' => false
-    case '<' | '>' | '&' | '"' | '\'' | '\\' | '`' | '/' => false
-    case _ => true
+    val longChars: List[Char] = long.toList
   }
 
   object impls {
+
+    @inline final def isSafeSameSpeedButLessReadable(c: Char): Boolean =
+      c >= ' ' && c <= '~' && /* printable ascii 32-126 */
+        c != '<' && c != '>' && c != '&' && c != '"' && c != '\'' && /* html */
+        c != '\\' && /* remaining js */
+        c != '`' && c != '/' /* extra care */
+
+    @inline final def isSafe(c: Char): Boolean = c match {
+      case _ if c < ' ' || c > '~' => false
+      case '<' | '>' | '&' | '"' | '\'' | '\\' | '`' | '/' => false
+      case _ => true
+    }
     /*
      * Benchmark                       Mode  Cnt      Score      Error  Units
      * SafeJsonStringTest.base_arabic  avgt   10  40841.062 ± 2646.024  ns/op
@@ -142,11 +143,12 @@ class SafeJsonStringTest {
     }
 
     def opt5(s: String): String = {
-      val sb = new StringBuilder(s.size)
+      val sb = new StringBuilder(s.size * 3/2 + 2)
+      sb.append('"')
       var i = 0
       while (i < s.length) {
         val c = s charAt i
-        if (isSafe2(c)) sb.append(c)
+        if (isSafe(c)) sb.append(c)
         else {
           if (c <= '\u000f') sb.append("\\u000")
           else if (c <= '\u00ff') sb.append("\\u00")
@@ -156,63 +158,53 @@ class SafeJsonStringTest {
         }
         i += 1
       }
-      sb.toString
-    }
-
-    def opt6(s: String): String = {
-      val sb = new StringBuilder(3 * s.size >> 1)
-      var i = 0
-      while (i < s.length) {
-        val c = s charAt i
-        if (isSafe2(c)) sb.append(c)
-        else {
-          sb.append(c match {
-            case _ if c <= '\u000f' => "\\u000"
-            case _ if c <= '\u00ff' => "\\u00"
-            case _ if c <= '\u0fff' =>"\\u0"
-            case _ => "\\u"
-          })
-          sb.append(c.toHexString)
-        }
-        i += 1
-      }
+      sb.append('"')
       sb.toString
     }
   }
 
-  @Benchmark
-  def base_short = impls.base(strings.short)
+  // @Benchmark
+  // def base_short = impls.base(strings.short)
+
+  // @Benchmark
+  // def base_medium = impls.base(strings.medium)
+
+  // @Benchmark
+  // def base_long = impls.base(strings.long)
+
+  // @Benchmark
+  // def base_arabic = impls.base(strings.arabic)
+
+  // @Benchmark
+  // def opt1_short = impls.opt1(strings.short)
+
+  // @Benchmark
+  // def opt1_medium = impls.opt1(strings.medium)
+
+  // @Benchmark
+  // def opt1_long = impls.opt1(strings.long)
+
+  // @Benchmark
+  // def opt2_arabic = impls.opt2(strings.arabic)
+
+  // @Benchmark
+  // def opt3_arabic = impls.opt3(strings.arabic)
 
   @Benchmark
-  def base_medium = impls.base(strings.medium)
-
-  @Benchmark
-  def base_long = impls.base(strings.long)
-
-  @Benchmark
-  def base_arabic = impls.base(strings.arabic)
-
-  @Benchmark
-  def opt1_short = impls.opt1(strings.short)
-
-  @Benchmark
-  def opt1_medium = impls.opt1(strings.medium)
-
-  @Benchmark
-  def opt1_long = impls.opt1(strings.long)
-
-  @Benchmark
-  def opt2_arabic = impls.opt2(strings.arabic)
-
-  @Benchmark
-  def opt3_arabic = impls.opt3(strings.arabic)
+  def opt4_medium = impls.opt4(strings.medium)
 
   @Benchmark
   def opt4_arabic = impls.opt4(strings.arabic)
 
   @Benchmark
-  def opt5_arabic = impls.opt5(strings.arabic)
+  def opt5_medium = impls.opt5(strings.medium)
 
   @Benchmark
-  def opt6_arabic = impls.opt6(strings.arabic)
+  def opt5_arabic = impls.opt5(strings.arabic)
+
+//   @Benchmark
+//   def isSafe = strings.longChars foreach impls.isSafe
+
+//   @Benchmark
+//   def isSafe2 = strings.longChars foreach impls.isSafe2
 }
