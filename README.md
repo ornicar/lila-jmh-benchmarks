@@ -4,7 +4,7 @@ lichess micro benchmarks
 
 ```
 sbt
-jmh:run -i 1 -wi 1 AnyValTest
+jmh:run -i 3 -wi 2 AnyValTest
 ```
 
 Where AnyValTest is a custom benchmark defined in src/main/scala/AnyValTest.scala
