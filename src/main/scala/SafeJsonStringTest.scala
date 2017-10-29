@@ -40,11 +40,10 @@ class SafeJsonStringTest {
         c != '\\' && /* remaining js */
         c != '`' && c != '/' /* extra care */
 
-    @inline final def isSafe(c: Char): Boolean = c match {
-      case _ if c < ' ' || c > '~' => false
+    @inline final def isSafe(c: Char): Boolean = c >= ' ' && c <= '~' && (c match {
       case '<' | '>' | '&' | '"' | '\'' | '\\' | '`' | '/' => false
       case _ => true
-    }
+    })
     /*
      * Benchmark                       Mode  Cnt      Score      Error  Units
      * SafeJsonStringTest.base_arabic  avgt   10  40841.062 ± 2646.024  ns/op
@@ -142,22 +141,24 @@ class SafeJsonStringTest {
       sb.toString
     }
 
-    def opt4Optimist(s: String): String =
-      if (s.forall(isSafe)) s""""$s"""" else opt4(s)
-
-    def opt5(s: String): String = if (s.forall(isSafe)) s""""$s"""" else {
-      val sb = new StringBuilder(s.size * 2 + 2)
+    def opt5(s: String): String = {
+      val len = s.length
+      val fact = if (len > 0 && isSafe(s charAt 0)) 1 else 6
+      val sb = new StringBuilder(fact * len + 2)
       sb.append('"')
       var i = 0
-      while (i < s.length) {
+      while (i < len) {
         val c = s charAt i
         if (isSafe(c)) sb.append(c)
         else {
-          if (c <= '\u000f') sb.append("\\u000")
-          else if (c <= '\u00ff') sb.append("\\u00")
-          else if (c <= '\u0fff') sb.append("\\u0")
-          else sb.append("\\u")
-          sb.append(c.toInt.toHexString.toUpperCase)
+          sb.append(
+            if (c > '\u00ff') {
+              if (c > '\u0fff') "\\u" else "\\u0"
+            } else {
+              if (c > '\u000f') "\\u00" else "\\u000"
+            }
+          )
+          sb.append(Integer.toHexString(c).toUpperCase)
         }
         i += 1
       }
@@ -193,41 +194,19 @@ class SafeJsonStringTest {
   // @Benchmark
   // def opt3_arabic = impls.opt3(strings.arabic)
 
-  // @Benchmark
-  // def opt4_medium = impls.opt4(strings.medium)
-
-  // @Benchmark
-  // def opt4_arabic = impls.opt4(strings.arabic)
-
-  // @Benchmark
-  // def opt5_medium = impls.opt5(strings.medium)
-
-  // @Benchmark
-  // def opt5_arabic = impls.opt5(strings.arabic)
-
-  // @Benchmark
-  // def opt4_medium = impls.opt4(strings.medium)
-
-  // @Benchmark
-  // def opt4_arabic = impls.opt4(strings.arabic)
-
-//   @Benchmark
-//   def opt4_short = impls.opt4(strings.short)
-
-//   @Benchmark
-//   def opt4Optimist_short = impls.opt4Optimist(strings.short)
-
-//   @Benchmark
-//   def opt4Optimist_medium = impls.opt4Optimist(strings.medium)
+  @Benchmark
+  def opt4_medium = impls.opt4(strings.medium)
 
   @Benchmark
-  def opt4Optimist_arabic = impls.opt4Optimist(strings.arabic)
+  def opt4_arabic = impls.opt4(strings.arabic)
+
+  @Benchmark
+  def opt5_medium = impls.opt5(strings.medium)
 
   @Benchmark
   def opt5_arabic = impls.opt5(strings.arabic)
 
 //   @Benchmark
-//   def isSafe = strings.longChars foreach impls.isSafe
 
 //   @Benchmark
 //   def isSafe2 = strings.longChars foreach impls.isSafe2
