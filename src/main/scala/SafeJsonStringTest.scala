@@ -143,9 +143,9 @@ class SafeJsonStringTest {
     }
 
     def opt4Optimist(s: String): String =
-      if (s.forall(isSafe)) s"\"$s\"" else opt4(s)
+      if (s.forall(isSafe)) s""""$s"""" else opt4(s)
 
-    def opt5(s: String): String = if (s.forall(isSafe)) s"\"$s\"" else {
+    def opt5(s: String): String = if (s.forall(isSafe)) s""""$s"""" else {
       val sb = new StringBuilder(s.size * 2 + 2)
       sb.append('"')
       var i = 0
