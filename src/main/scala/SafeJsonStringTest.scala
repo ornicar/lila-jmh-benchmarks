@@ -34,7 +34,7 @@ class SafeJsonStringTest {
     c >= ' ' && c <= '~' && /* printable ascii 32-126 */
       c != '<' && c != '>' && c != '&' && c != '"' && c != '\'' && /* html */
       c != '\\' && /* remaining js */
-      c != '`' && c != '/' && /* extra care */
+      c != '`' && c != '/' /* extra care */
 
   object impls {
     /*
@@ -63,7 +63,8 @@ class SafeJsonStringTest {
      * SafeJsonStringTest.opt1_short   avgt   10     68.615 ±    4.548  ns/op
      */
     def opt1(s: String): String = {
-      val sb = new StringBuilder(s.size)
+      val sb = new StringBuilder(s.size + 2)
+      sb.append('"')
       var i = 0
       while (i < s.length) {
         val c = s charAt i
@@ -74,6 +75,7 @@ class SafeJsonStringTest {
         }
         i += 1
       }
+      sb.append('"')
       sb.toString
     }
 
@@ -85,7 +87,8 @@ class SafeJsonStringTest {
 [info] SafeJsonStringTest.opt2_short   avgt   10     67.328 ±    4.376  ns/op
 */
     def opt2(s: String): String = {
-      val sb = new StringBuilder(s.size)
+      val sb = new StringBuilder(s.size + 2)
+      sb.append('"')
       var i = 0
       while (i < s.length) {
         val c = s charAt i
@@ -93,11 +96,13 @@ class SafeJsonStringTest {
         else sb.append(s"\\u${c.toInt.toHexString.reverse.toUpperCase.padTo(4, '0').reverse}")
         i += 1
       }
+      sb.append('"')
       sb.toString
     }
 
     def opt3(s: String): String = {
-      val sb = new StringBuilder(s.size)
+      val sb = new StringBuilder(s.size + 2)
+      sb.append('"')
       var i = 0
       while (i < s.length) {
         val c = s charAt i
@@ -105,11 +110,13 @@ class SafeJsonStringTest {
         else sb.append(f"\\u${c.toInt}%04X")
         i += 1
       }
+      sb.append('"')
       sb.toString
     }
 
     def opt4(s: String): String = {
-      val sb = new StringBuilder(s.size)
+      val sb = new StringBuilder(s.size + 2)
+      sb.append('"')
       var i = 0
       while (i < s.length) {
         val c = s charAt i
@@ -123,6 +130,7 @@ class SafeJsonStringTest {
         }
         i += 1
       }
+      sb.append('"')
       sb.toString
     }
   }
