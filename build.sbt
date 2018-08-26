@@ -2,7 +2,7 @@ name := """lila-jmh-benchmarks"""
 
 version := "1.0-SNAPSHOT"
 
-scalaVersion := "2.12.4"
+scalaVersion := "2.12.6"
 
 libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-json" % "2.6.9",
