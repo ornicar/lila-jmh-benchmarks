@@ -10,6 +10,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.stm._
 
+import java.util.concurrent.atomic._
+
 @State(Scope.Thread)
 @BenchmarkMode(Array(Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
@@ -32,31 +34,22 @@ class DuctTest extends Zero.Syntax {
       def enqueue(msg: Any) = copy(queue = queue enqueue msg)
     }
 
-    def !(msg: Any): Unit = atomic { implicit txn =>
-      stateRef.transform { state =>
+    def !(msg: Any): Unit =
+      if (!stateRef.single.getAndTransform { state =>
         if (state.busy) state enqueue msg
-        else {
-          Txn.afterCommit { _ => run(msg) }
-          state.copy(busy = true)
-        }
-      }
-    }
+        else state.copy(busy = true)
+      }.busy) run(msg)
 
     private[this] val stateRef = Ref(State(false, Queue.empty))
 
     private[this] def run(msg: Any): Unit =
       process.applyOrElse(msg, fallback) onComplete { _ => postRun }
 
-    private[this] def postRun = atomic { implicit txn =>
-      stateRef.transform { state =>
-        state.queue.dequeueOption match {
-          case None => state.copy(busy = false)
-          case Some((msg, newQueue)) =>
-            Txn.afterCommit { _ => run(msg) }
-            State(true, newQueue)
-        }
-      }
-    }
+    private[this] def postRun =
+      stateRef.single.getAndTransform { state =>
+        if (state.queue.isEmpty) state.copy(busy = false)
+        else state.copy(queue = state.queue.tail)
+      }.queue.headOption foreach run
   }
 
   trait DuctSynchronized {
@@ -79,15 +72,84 @@ class DuctTest extends Zero.Syntax {
   }
 
   val processTrue: ReceiveAsync = {
-    case true => Future.successful(true)
+    case true => Future(true) // Async result
   }
+
+  trait DuctAtomicNull {
+    // implement async behaviour here
+    protected val process: ReceiveAsync
+
+    def !(msg: Any): Unit =
+      if (state.getAndUpdate {
+        case null => Queue.empty
+        case q => q enqueue msg
+      } == null) run(msg)
+
+    def queueSize = state.get match {
+      case null => 0
+      case q => q.size + 1
+    }
+
+    /*
+     * Queue contains msg currently processing, as well as backlog.
+     * Idle: null
+     * Busy: queue.isEmpty
+     * Busy with backlog: queue.size > 0
+     */
+    private[this] val state: AtomicReference[Queue[Any]] = new AtomicReference()
+
+    private[this] def run(msg: Any): Unit =
+      process.applyOrElse(msg, fallback) onComplete postRun
+
+    private[this] val postRun = (_: Any) =>
+      state.getAndUpdate { q =>
+        if (q.isEmpty) null
+        else q.tail
+      }.headOption foreach run
+  }
+
+  trait DuctAtomic {
+    // implement async behaviour here
+    protected val process: ReceiveAsync
+
+    def !(msg: Any): Unit =
+      if (state.getAndUpdate { _ enqueue msg } isEmpty) run(msg)
+
+    def queueSize = state.get.size
+
+    /*
+     * Queue contains msg currently processing, as well as backlog.
+     * Idle: null
+     * Busy: queue.isEmpty
+     * Busy with backlog: queue.size > 0
+     */
+    private[this] val state: AtomicReference[Queue[Any]] = new AtomicReference(Queue.empty)
+
+    private[this] def run(msg: Any): Unit =
+      process.applyOrElse(msg, fallback) onComplete postRun
+
+    private[this] val postRun = (_: Any) =>
+      state.updateAndGet(_.tail).headOption foreach run
+  }
+
+
 
   val ductSTM = new DuctSTM { val process = processTrue }
   val ductSynchronized = new DuctSynchronized { val process = processTrue }
+
+  val ductAtomic = new DuctAtomic { val process = processTrue }
+  val ductAtomicNull = new DuctAtomicNull { val process = processTrue }
+
 
   @Benchmark
   def stm = ductSTM ! true
 
   @Benchmark
   def sync = ductSynchronized ! true
+
+  @Benchmark
+  def atomic = ductAtomic ! true
+
+  @Benchmark
+  def atomicNull = ductAtomicNull ! true
 }
