@@ -15,7 +15,7 @@ import scala.concurrent.stm._
 @State(Scope.Thread)
 @BenchmarkMode(Array(Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
-class Sequential extends Zero.Syntax {
+class TrouperSelfPing extends Zero.Syntax {
 
   /*
    * [info] Benchmark                     Mode  Cnt         Score   Error  Units
@@ -27,9 +27,9 @@ class Sequential extends Zero.Syntax {
   object Wut
 
   object make {
-    def pingTrouper(messages: Int, latch: CountDownLatch) = new Trouper {
+    def selfPingSTMTrouper(messages: Int, latch: CountDownLatch) = new STMTrouper {
       var left = messages
-      val process: Trouper.Receive = {
+      val process: STMTrouper.Receive = {
         case Ping =>
           if (left == 0) latch.countDown()
           else {
@@ -41,9 +41,9 @@ class Sequential extends Zero.Syntax {
         case Wut =>
       }
     }
-    def pingAtomicTrouper(messages: Int, latch: CountDownLatch) = new AtomicTrouper {
+    def selfPingAtomicTrouper(messages: Int, latch: CountDownLatch) = new AtomicTrouper {
       var left = messages
-      val process: Trouper.Receive = {
+      val process: AtomicTrouper.Receive = {
         case Ping =>
           if (left == 0) latch.countDown()
           else {
@@ -58,11 +58,11 @@ class Sequential extends Zero.Syntax {
   }
 
   @Benchmark
-  def pingTrouper = {
+  def selfPingSTMTrouper = {
     val messages = 100000
     val startNanoTime = System.nanoTime()
     val latch = new CountDownLatch(1)
-    make.pingTrouper(messages, latch) ! Ping
+    make.selfPingSTMTrouper(messages, latch) ! Ping
     latch.await(1, TimeUnit.SECONDS)
     val durationMicros = (System.nanoTime() - startNanoTime) / 1000
     println(f"$messages pings took ${durationMicros / 1000} ms, " +
@@ -70,11 +70,11 @@ class Sequential extends Zero.Syntax {
   }
 
   @Benchmark
-  def pingAtomicTrouper = {
+  def selfPingAtomicTrouper = {
     val messages = 100000
     val startNanoTime = System.nanoTime()
     val latch = new CountDownLatch(1)
-    make.pingAtomicTrouper(messages, latch) ! Ping
+    make.selfPingAtomicTrouper(messages, latch) ! Ping
     latch.await(1, TimeUnit.SECONDS)
     val durationMicros = (System.nanoTime() - startNanoTime) / 1000
     println(f"$messages pings took ${durationMicros / 1000} ms, " +

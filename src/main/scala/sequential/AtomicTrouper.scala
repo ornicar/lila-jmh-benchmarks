@@ -52,7 +52,7 @@ trait AtomicTrouper {
   private[this] val postRun = (_: Any) =>
     stateRef.getAndUpdate(postRunUpdate) flatMap (_.headOption) foreach run
 
-  private val fallback: Trouper.Receive = {
+  private val fallback: Receive = {
     case Shutdown => stop()
     case msg => println(s"unhandled msg: $msg")
   }

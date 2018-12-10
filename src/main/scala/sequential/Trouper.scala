@@ -12,10 +12,12 @@ import scala.concurrent.ExecutionContext.Implicits.global
  * Has an unbounded (!) Queue of messages.
  * Like Duct, but for synchronous message processors.
  */
-trait Trouper {
+trait STMTrouper {
+
+  import STMTrouper._
 
   // implement async behaviour here
-  protected val process: Trouper.Receive
+  protected val process: Receive
 
   private[this] var alive = true
 
@@ -57,15 +59,15 @@ trait Trouper {
       }
     } flatMap (_.headOption) foreach run
 
-  private val fallback: Trouper.Receive = {
-    case Trouper.Shutdown => stop()
+  private val fallback: Receive = {
+    case Shutdown => stop()
     case msg => println(s"unhandled msg: $msg")
   }
 
   lazy val uniqueId = Integer.toHexString(hashCode)
 }
 
-object Trouper {
+object STMTrouper {
 
   case object Shutdown
 
