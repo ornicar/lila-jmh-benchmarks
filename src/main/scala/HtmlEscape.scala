@@ -2,6 +2,7 @@ package org.openjdk.jmh.samples
 
 import org.openjdk.jmh.annotations._
 
+import java.lang.{ StringBuilder => jStringBuilder }
 import java.util.concurrent.TimeUnit
 
 @State(Scope.Thread)
@@ -46,6 +47,33 @@ class HtmlEscape {
     s
   }
 
+  // newlines to breaks with at most 2 consecutive breaks
+  def nl2brLimited(s: String): String =
+    s.replaceAll("[\r\n]{3,}", "\n\n")
+      .replaceAll("\r\n|\n", "<br />") 
+
+  // newlines to breaks with no limit to consecutive breaks
+  def nl2brUnlimited(s: String): String = {
+      var i = s.indexOf('\n')
+      if (i < 0) s
+      else {
+        val sb      = new jStringBuilder(s.length + 30)
+        var copyIdx = 0
+        do {
+          if (i > copyIdx) {
+            // copyIdx >= 0, so i - 1 >= 0
+            sb.append(s, copyIdx, if (s.charAt(i - 1) == '\r') i - 1 else i)
+          }
+          sb.append("<br />")
+          copyIdx = i + 1
+          i = s.indexOf('\n', copyIdx)
+        } while (i >= 0)
+
+        sb.append(s, copyIdx, s.length)
+        sb.toString
+      }
+    }
+
   val badChars = "[<>&\"']".r.pattern
   def escapeOptimistRegex(s: String): String = if (badChars.matcher(s).find) escape(s) else s
 
@@ -54,6 +82,9 @@ class HtmlEscape {
 
   val longAscii = "Free online Chess server. Play Chess now in a clean interface. No registration, no ads, no plugin required. Play Chess with the computer, friends or random opponents."
   val longUnicode = "Бесплатные онлайн-шахматы. Играйте в шахматы прямо сейчас в простом интерфейсе без рекламы. Не требует регистрации и скачивания программы. Играйте в шахматы с компьи."
+
+  val shortNewLines = "Hello\n\n\nWorld"
+  val longNewLines = "Hello\n\n\nWorld\n\n\nHere\n\n\nI\n\n\nCome\n\n\nAgain.\n\n\nWanna\n\n\nPlay\n\n\nChess?"
 
   @Benchmark
   def testShortAscii = escape(shortAscii)
@@ -72,5 +103,17 @@ class HtmlEscape {
 
   @Benchmark
   def testLongUnicodeOptimistRegex = escapeOptimistRegex(shortUnicode)
+
+  @Benchmark
+  def testShortNewLinesLimited = nl2brLimited(shortNewLines)
+
+  @Benchmark
+  def testShortNewLinesUnlimited = nl2brUnlimited(shortNewLines)
+
+  @Benchmark
+  def testLongNewLinesLimited = nl2brLimited(longNewLines)
+
+  @Benchmark
+  def testLongNewLinesUnlimited = nl2brUnlimited(longNewLines)
 }
 
