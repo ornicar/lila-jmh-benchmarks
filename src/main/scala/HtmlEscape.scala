@@ -47,8 +47,26 @@ class HtmlEscape {
     s
   }
 
-  // newlines to breaks with at most 2 consecutive breaks
-  def nl2brLimited(s: String): String =
+  // newlines to breaks with at most 2 consecutive breaks using loop
+  def nl2brLimitedLoop(s: String): String = {
+    val sb = new jStringBuilder(s.length)
+    var counter = 0
+    for (char <- s) {
+      if (char == '\n') {
+        counter += 1
+        if (counter < 3) {
+          sb.append("<br />")
+        }
+      } else if (char != '\r') {
+        counter = 0
+        sb.append(char)
+        }
+    }
+    sb.toString
+  }
+
+  // newlines to breaks with at most 2 consecutive breaks using regex
+  def nl2brLimitedRegex(s: String): String =
     s.replaceAll("[\r\n]{3,}", "\n\n")
       .replaceAll("\r\n|\n", "<br />") 
 
@@ -105,13 +123,19 @@ class HtmlEscape {
   def testLongUnicodeOptimistRegex = escapeOptimistRegex(shortUnicode)
 
   @Benchmark
-  def testShortNewLinesLimited = nl2brLimited(shortNewLines)
+  def testShortNewLinesLimitedRegex = nl2brLimitedRegex(shortNewLines)
+
+  @Benchmark
+  def testShortNewLinesLimitedLoop = nl2brLimitedLoop(shortNewLines)
 
   @Benchmark
   def testShortNewLinesUnlimited = nl2brUnlimited(shortNewLines)
 
   @Benchmark
-  def testLongNewLinesLimited = nl2brLimited(longNewLines)
+  def testLongNewLinesLimitedRegex = nl2brLimitedRegex(longNewLines)
+
+  @Benchmark
+  def testLongNewLinesLimitedKLoop = nl2brLimitedLoop(longNewLines)
 
   @Benchmark
   def testLongNewLinesUnlimited = nl2brUnlimited(longNewLines)
